@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Video Control Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-card: #242424;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #3498db;
+            --accent-hover: #2980b9;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --border: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 1.75rem;
+            color: var(--text-primary);
+        }
+
+        .message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .status {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .status-icon {
+            margin-right: 1rem;
+            color: var(--accent);
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .status-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-value {
+            color: var(--text-primary);
+            font-size: 0.925rem;
+            word-break: break-all;
+        }
+
+        .file-selector {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .selector-group {
+            margin-bottom: 1rem;
+        }
+
+        .selector-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .selector-label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .file-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-select option {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            padding: 0.5rem;
+        }
+
+        .selector-button {
+            background: var(--accent);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .selector-button:hover {
+            background: var(--accent-hover);
+        }
+
+        .upload-form {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .file-input::-webkit-file-upload-button {
+            visibility: hidden;
+            width: 0;
+        }
+
+        .file-input::before {
+            content: 'Choose File';
+            display: inline-block;
+            background: var(--accent);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover:not([disabled]) {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .button[disabled] {
+            background: var(--border);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-badge.playing {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.ready {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--accent);
+        }
+
+        .status-badge i {
+            margin-right: 0.5rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Video Control Panel</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="file-selector">
+            <div class="selector-group">
+                <form action="{{ url_for('select_file') }}" method="post">
+                    <input type="hidden" name="type" value="image">
+                    <label class="selector-label">
+                        <i class="fas fa-image"></i> Select Image
+                    </label>
+                    <select name="path" class="file-select">
+                        {% for name, path in images %}
+                            <option value="{{ path }}" {% if path == current_image %}selected{% endif %}>
+                                {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="selector-button">
+                        <i class="fas fa-check"></i> Set Image
+                    </button>
+                </form>
+            </div>
+
+            <div class="selector-group">
+                <form action="{{ url_for('select_file') }}" method="post">
+                    <input type="hidden" name="type" value="video">
+                    <label class="selector-label">
+                        <i class="fas fa-video"></i> Select Video
+                    </label>
+                    <select name="path" class="file-select">
+                        {% for name, path in videos %}
+                            <option value="{{ path }}" {% if path == current_video %}selected{% endif %}>
+                                {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="selector-button">
+                        <i class="fas fa-check"></i> Set Video
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="status">
+            <div class="status-item">
+                <i class="fas fa-circle status-icon"></i>
+                <div>
+                    <div class="status-label">Status</div>
+                    <div class="status-value">
+                        <span id="playStatus" class="status-badge {% if is_playing %}playing{% else %}ready{% endif %}">
+                            <i class="fas {% if is_playing %}fa-play-circle pulse{% else %}fa-check-circle{% endif %}"></i>
+                            <span id="statusText">{% if is_playing %}Video Playing{% else %}Ready to Play{% endif %}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <form class="upload-form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" accept="video/*,image/*" required class="file-input">
+            </div>
+            <button type="submit" class="button">
+                <i class="fas fa-upload"></i> Upload File
+            </button>
+        </form>
+
+        <form action="{{ url_for('play') }}" method="get" id="playForm">
+            <button type="submit" class="button" id="playButton" {% if is_playing %}disabled{% endif %}>
+                <i class="fas {% if is_playing %}fa-spinner fa-spin{% else %}fa-play{% endif %}"></i>
+                <span id="playButtonText">{% if is_playing %}Video Playing...{% else %}Play Video{% endif %}</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Auto-refresh status
+        function checkStatus() {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const isPlaying = doc.querySelector('#playButton').disabled;
+
+                    // Update button state
+                    const playButton = document.querySelector('#playButton');
+                    const playButtonText = document.querySelector('#playButtonText');
+                    const statusBadge = document.querySelector('#playStatus');
+                    const statusText = document.querySelector('#statusText');
+
+                    playButton.disabled = isPlaying;
+
+                    if (isPlaying) {
+                        playButtonText.textContent = 'Video Playing...';
+                        playButton.querySelector('i').className = 'fas fa-spinner fa-spin';
+                        statusBadge.className = 'status-badge playing';
+                        statusText.textContent = 'Video Playing';
+                        statusBadge.querySelector('i').className = 'fas fa-play-circle pulse';
+                    } else {
+                        playButtonText.textContent = 'Play Video';
+                        playButton.querySelector('i').className = 'fas fa-play';
+                        statusBadge.className = 'status-badge ready';
+                        statusText.textContent = 'Ready to Play';
+                        statusBadge.querySelector('i').className = 'fas fa-check-circle';
+                    }
+                });
+        }
+
+        // Check status every 2 seconds
+        setInterval(checkStatus, 2000);
+
+        // Remove flash messages after 5 seconds
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(msg => {
+                msg.style.transition = 'opacity 0.5s ease';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
